@@ -135,7 +135,7 @@ func norm(a []float64) float64 {
 }
 
 // fetchStats posts Q and R matrices to the Node.js service to get stats
-func fetchStats(baseURL string, authorizationHeader string, matrices ...[][]float64) (any, error) {
+func fetchStats(fullURL string, authorizationHeader string, matrices ...[][]float64) (any, error) {
 	client := &http.Client{}
 	payload := struct {
 		Matrices [][][]float64 `json:"matrices"`
@@ -145,7 +145,7 @@ func fetchStats(baseURL string, authorizationHeader string, matrices ...[][]floa
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(http.MethodPost, baseURL+"/stats", bytes.NewReader(body))
+	req, err := http.NewRequest(http.MethodPost, fullURL, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
