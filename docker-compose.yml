@@ -34,6 +34,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: qr-frontend
     env_file:
       - .env
     environment:
@@ -41,14 +42,13 @@ services:
       - VITE_API_NODE=${VITE_API_NODE}
     ports:
       - "5173:5173"
+    networks:
+      - app-net
     depends_on:
       - api-go
       - api-nodejs
-    networks:
-      - app-net
+    restart: unless-stopped
 
 networks:
   app-net:
     driver: bridge
-
-

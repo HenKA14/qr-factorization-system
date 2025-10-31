@@ -22,6 +22,7 @@ func main() {
         return c.SendFile("/docs/swagger.json", true)
     })
     app.Get("/docs/ui", func(c *fiber.Ctx) error {
+        c.Type("html")
         return c.SendString(`<!doctype html>
 <html>
   <head>
