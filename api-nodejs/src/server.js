@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { computeStats } from './util.mjs'
 import cors from 'cors'
+import path from 'path'
 
 const app = express();
 app.use(express.json());
@@ -38,9 +39,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Serve OpenAPI JSON
+// Serve OpenAPI JSON (absolute path compatible with Render)
 app.get('/docs', (req, res) => {
-  res.sendFile('/app/src/swagger.json');
+  const filePath = path.join(process.cwd(), 'src', 'swagger.json');
+  res.sendFile(filePath);
 });
 
 // Serve Swagger UI (simple HTML)
