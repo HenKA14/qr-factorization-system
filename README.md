@@ -85,3 +85,49 @@ curl -s -X POST http://localhost:3000/stats \
 - Extensiones opcionales: JWT, frontend, pruebas unitarias/integración.
 
 
+## Despliegue (Producción)
+
+Se utiliza un monorepo con 3 servicios:
+
+- API Node.js (Express) → Render (Web Service)
+- API Go (Fiber) → Render (Web Service)
+- Frontend (Vite/React) → Netlify (Static Site)
+
+### Render: API Node.js
+- Root directory: `api-nodejs`
+- Build: `npm install --omit=dev`
+- Start: `node src/server.js`
+- Env:
+  - `PORT=3000`
+  - `JWT_SECRET=<tu_secreto>`
+- Swagger UI: `https://<node>.onrender.com/docs/ui`
+- CORS: añadir el dominio de Netlify en `origin` (por ejemplo `https://<tu-front>.netlify.app`).
+
+### Render: API Go
+- Root directory: `api-go`
+- Build: `go build -o server ./`
+- Start: `./server`
+- Env:
+  - `PORT=8080`
+  - `JWT_SECRET=<mismo que Node>`
+  - `NODE_API_URL=https://<node>.onrender.com/stats`
+- Swagger UI: `https://<go>.onrender.com/docs/ui`
+
+### Netlify: Frontend (Vite)
+- Base directory: `frontend`
+- Build: `npm run build`
+- Publish: `dist`
+- Env:
+  - `VITE_API_GO=https://<go>.onrender.com`
+  - `VITE_API_NODE=https://<node>.onrender.com`
+
+### Flujo de autenticación en Swagger
+1. En Node `/docs/ui`, ejecutar `POST /auth/login` y copiar el token.
+2. Presionar “Authorize” y pegar el token (sin el prefijo `Bearer`).
+3. En Go `/docs/ui`, “Authorize” con el mismo token y probar `POST /qr`.
+
+### Troubleshooting
+- `Failed to load API definition /docs (404)`: asegúrate de servir `swagger.json` con ruta válida (Node usa `process.cwd()`, Go sirve `./docs/swagger.json`).
+- Sin `stats` en producción: verifica `NODE_API_URL` en Go (debe apuntar a `/stats` público) y que se reenvíe el header `Authorization`.
+
+
