@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+
+      - name: Go tests
+        working-directory: api-go
+        run: |
+          go mod tidy
+          go test ./...
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Node stats test
+        working-directory: api-nodejs
+        run: |
+          npm ci || npm i
+          node src/stats.test.mjs
+
+      - name: Docker build
+        run: |
+          docker build -t api-go ./api-go
+          docker build -t api-nodejs ./api-nodejs
+
+

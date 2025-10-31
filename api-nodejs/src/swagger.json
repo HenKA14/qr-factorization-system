@@ -1,0 +1,33 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "API Node - Stats", "version": "1.0.0" },
+  "paths": {
+    "/health": { "get": { "responses": { "200": {"description": "ok"} } } },
+    "/stats": {
+      "post": {
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "matrices": {
+                    "type": "array",
+                    "items": {"type": "array", "items": {"type": "array", "items": {"type": "number"}}}
+                  }
+                },
+                "required": ["matrices"]
+              }
+            }
+          }
+        },
+        "responses": { "200": {"description": "stats"}, "401": {"description": "unauthorized"} }
+      }
+    }
+  },
+  "components": { "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } } }
+}
+
+

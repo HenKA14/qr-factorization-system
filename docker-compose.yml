@@ -1,0 +1,54 @@
+services:
+  api-go:
+    build:
+      context: ./api-go
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - NODE_API_URL=${NODE_API_URL}
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api-nodejs
+    networks:
+      - app-net
+
+  api-nodejs:
+    build:
+      context: ./api-nodejs
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - PORT=${NODE_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "3000:3000"
+    networks:
+      - app-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - VITE_API_GO=${VITE_API_GO}
+      - VITE_API_NODE=${VITE_API_NODE}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api-go
+      - api-nodejs
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
+
+
